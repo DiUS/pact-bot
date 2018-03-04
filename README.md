@@ -1,6 +1,6 @@
 # Pact Bot
 
-Really basic Twitter bot running on Zeit.co.
+Really basic Twitter bot running on ~Zeit.co.~ - privately hosted platform (Zeit.co like Heroku shuts down quiet apps, meaning the stream API - which we use to respond to follows - is useless).
 
 Currently follows a follower, and sends a customised DM introducing them to the Pact ecosystem.
 
