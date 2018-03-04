@@ -21,19 +21,73 @@ function tweetNow(text) {
   })
 }
 
-// function: replies to user who followed
+// function: tweets back to user who followed
+function directMessage(user, text) {
+  let tweet = {
+    event: {
+      type: "message_create",
+      message_create: {
+        target: {
+          recipient_id: `${user}`
+        },
+        message_data: {
+          text: text
+        }
+      }
+    }
+  }
+
+  return bot.post('direct_messages/events/new', tweet, (err, data, response) => {
+    if (err) {
+      console.lol('ERRORDERP Reply', err)
+    }
+    console.lol('SUCCESS: Replied: ', text)
+  })
+}
+
+function follow(user) {
+  return bot.post('friendships/create', { user_id: user, follow: false }, function (err, data, response) {
+    if (err) {
+      console.lol('ERRORDERP Reply', err)
+    } else {
+      console.lol(`SUCCESS: followed ${user}`)
+    }
+  })
+}
+
+// function: Follow and DM user
 const reply = event => {
-  // get user's twitter handler/screen name
   let screenName = event.source.screen_name
+  let user_id = event.source.id
 
   if (screenName === config.twitterConfig.username) {
     return
   }
-  const response = randomReply()
 
-  const res = response.replace('${screenName}', screenName)
+  follow(user_id)
+    .then(() => {
+      const response = randomReply()
+      const res = response.replace('${screenName}', screenName)
 
-  tweetNow(res)
+      directMessage(user_id, res)
+    }, (e) => {
+      console.log('FAILURE: ', e)
+    })
 }
+
+// // function: replies to user who followed
+// const reply = event => {
+//   // get user's twitter handler/screen name
+//   let screenName = event.source.screen_name
+
+//   if (screenName === config.twitterConfig.username) {
+//     return
+//   }
+//   const response = randomReply()
+
+//   const res = response.replace('${screenName}', screenName)
+
+//   tweetNow(res)
+// }
 
 module.exports = reply
